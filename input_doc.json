@@ -4,7 +4,9 @@
   "gravity": "1",
   "duration": 24,
   "interval": 0.2,
-  "elasticity": 1,
+  "c_friction": 1,
+  "k": 55,
+  "c_recovery": 1,
   "entities": [
     {
       "type": "circle",
@@ -20,7 +22,7 @@
       "type": "circle",
       "x": 700,
       "y": 400,
-      "vx": -60,
+      "vx": -30,
       "vy": 60,
       "r": 40,
       "m": 1,
@@ -28,4 +30,3 @@
     }
   ]
 }
-

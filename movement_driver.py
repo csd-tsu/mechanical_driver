@@ -9,6 +9,9 @@ import json
 import numpy as np
 import mechanics_module as mech
 import warnings
+from itertools import combinations
+from entities import Circle
+
 warnings.filterwarnings('ignore', 'The iteration is not making good progress')
 
 input_string = sys.stdin.read()
@@ -17,71 +20,60 @@ scene = json.loads(input_string)
 scene["frames"] = []
 
 frames_col = int(scene["duration"] / scene["interval"])
-
-
-# initial conditions
 t = np.arange(0, scene["duration"], scene["interval"])
-initial_vector = np.zeros((len(scene["entities"]), 4), float)
-for j in range(len(scene["entities"])):
-    initial_vector[j] = [scene["entities"][j]["x"], scene["entities"][j]["vx"],
-                         scene["entities"][j]["y"], scene["entities"][j]["vy"]]
+entities = []
 
-# lists for coordinates store
-x = []
-y = []
-vx = []
-vy = []
-
-for j in range(len(scene["entities"])):
-    x.append([])
-    vx.append([])
-    y.append([])
-    vy.append([])
+for entity in scene["entities"]:
+        if entity["type"] == "circle":
+            circle = Circle(
+                entity["m"],
+                entity["x"], entity["vx"],
+                entity["y"], entity["vy"],
+                entity["type"],
+                entity["r"],
+            )
+            entities.append(circle)
 
 
-def collision_circles():
-    """Recalculates coordinates and velocities of 2 circles after collision"""
+def collision():
+    """Recalculates coordinates and velocities of 2 entities after collision"""
     """Search the moment of collision"""
+    for pair in combinations(entities, 2):
+        t_collision = int(mech.search_collision(pair))
 
-    for j in range(len(scene["entities"])-1):
-        t_collision = int(mech.search_collision(x[j], x[j+1], y[j], y[j+1],
-                                                scene["entities"][j]["r"] + scene["entities"][j+1]["r"]))
-     
         if t_collision:
+            vx1, vy1, vx2, vy2 = mech.collision(
+                pair[0].x[t_collision], pair[0].vx[t_collision],
+                pair[0].y[t_collision], pair[0].vy[t_collision],
+                pair[1].x[t_collision], pair[1].vx[t_collision],
+                pair[1].y[t_collision], pair[1].vy[t_collision],
+                pair[0].m, pair[1].m,
+                scene["interval"], scene["c_recovery"],
+                scene["c_friction"], scene["k"])
+
             """calculate initial velocities after central collision"""
-            vx1, vy1, vx2, vy2, phi1, phi2 = mech.collision(vx[j][t_collision], vy[j][t_collision], vx[j+1][t_collision],
-                                                            vy[j+1][t_collision], x[j][t_collision], y[j][t_collision], x[j+1][t_collision],
-                                                            y[j+1][t_collision], scene["entities"][j]["m"],
-                                                            scene["entities"][j+1]["m"], scene["entities"][j]["r"],
-                                                            scene["entities"][j+1]["r"], scene["interval"], scene["elasticity"])
+            pair[0].initial_vector = [pair[0].x[t_collision], vx1, pair[0].y[t_collision], vy1]
+            pair[1].initial_vector = [pair[1].x[t_collision], vx2, pair[1].y[t_collision], vy2]
+
             """
-            slicing coordinates and velocities before collision for erase old 
-            coordinates and velocities starting from the moment 
+            slice coordinates and velocities before collision for erase old
+            coordinates and velocities starting from the moment
             when collision occurs
             """
-            x[j], vx[j], y[j], vy[j], x[j+1], vx[j+1], y[j+1], vy[j+1] = \
-                x[j][:t_collision+1], vx[j][:t_collision+1], y[j][:t_collision+1],\
-                vy[j][:t_collision+1], x[j+1][:t_collision+1], vx[j+1][:t_collision+1],\
-                y[j+1][:t_collision+1], vy[j+1][:t_collision+1]
- 
-            """calculate new coordinates and velocities after collision"""
-            initial_vector[j] = [x[j][t_collision], vx1, y[j][t_collision],vy1]
-            initial_vector[j+1] = [x[j+1][t_collision], vx2, y[j+1][t_collision], vy2]
+            pair[0].slice(t_collision)
+            pair[1].slice(t_collision)
             t_new = np.arange(t[t_collision], scene["duration"], scene["interval"])
-            x[j], vx[j], y[j], vy[j] = mech.trajectory(initial_vector[j], x[j], vx[j],
-                                                       y[j], vy[j], t_new)
-            x[j+1], vx[j+1], y[j+1], vy[j+1] = mech.trajectory(initial_vector[j+1],
-                                                               x[j+1], vx[j+1], y[j+1], vy[j+1], t_new)
+
+            """calculate new coordinates and velocities after collision"""
+            pair[0].trajectory(t_new)
+            pair[1].trajectory(t_new)
 
 
 def main():
-    for j in range(len(scene["entities"])):
-        # calculate coordinates
-        x[j], vx[j], y[j], vy[j] = mech.trajectory(initial_vector[j], x[j], vx[j], y[j], vy[j], t)
+    for entity in entities:
+        entity.trajectory(t)
+    collision()
 
-    # search for collision between circles
-    if len(scene["entities"]) > 1:
-        collision_circles()
 
 if __name__ == "__main__":
     main()
@@ -89,13 +81,12 @@ if __name__ == "__main__":
 
 for frame_index in xrange(1, frames_col):
     frame = {}
-    for j in range(len(scene["entities"])):
+    for j, entity in enumerate(entities):
         frame[j] = {}
-        frame[j]["x"] = x[j][frame_index]
-        frame[j]["y"] = y[j][frame_index]
-        frame[j]["vx"] = vx[j][frame_index]
-        frame[j]["vy"] = vy[j][frame_index]
+        frame[j]["x"] = entity.x[frame_index]
+        frame[j]["y"] = entity.y[frame_index]
+        frame[j]["vx"] = entity.vx[frame_index]
+        frame[j]["vy"] = entity.vy[frame_index]
     scene["frames"].append(frame)
 
 sys.stdout.write(json.dumps(scene))
-
