@@ -10,7 +10,7 @@ import numpy as np
 import mechanics_module as mech
 import warnings
 from itertools import combinations
-from entities import Circle
+from entities import Circle, Rectangle
 
 warnings.filterwarnings('ignore', 'The iteration is not making good progress')
 
@@ -33,6 +33,17 @@ for entity in scene["entities"]:
                 entity["r"],
             )
             entities.append(circle)
+
+        elif entity["type"] == "rect":
+            rect = Rectangle(
+                entity["m"],
+                entity["x"], entity["vx"],
+                entity["y"], entity["vy"],
+                entity["type"],
+                entity["width"],
+                entity["height"]
+            )
+            entities.append(rect)
 
 
 def collision():

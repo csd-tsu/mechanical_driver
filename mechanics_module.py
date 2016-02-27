@@ -39,15 +39,51 @@ def search_collision(entities):
     the first of possible collisions occurs 
     or 0 in the case of collision wasn't found.
     """
-    distance = map(
-        lambda q1, p1, q2, p2: sqrt((q1-q2)**2+(p1-p2)**2),
-        entities[0].x, entities[0].y, entities[1].x, entities[1].y
-    )
 
-    if entities[0].shape and entities[1].shape == "circle":
+    if entities[0].shape == "circle" and entities[1].shape == "circle":
         moment = 0
+        distance = map(
+            lambda q1, p1, q2, p2: sqrt((q1-q2)**2+(p1-p2)**2),
+            entities[0].x, entities[0].y, entities[1].x, entities[1].y
+        )
         for moment in range(len(distance)):
             if distance[moment] <= entities[0].r + entities[1].r:
+                break
+        if moment >= len(list(entities[0].x)):
+            moment = 0
+        return moment
+
+    elif entities[0].shape == "rect" and entities[1].shape == "rect":
+        moment = 0
+        for moment in range(len(entities[0].x)):
+            if entities[0].x[moment] + entities[0].width > entities[1].x[moment] and \
+                            entities[0].x[moment] < entities[1].x[moment] + entities[1].width and \
+                            entities[0].y[moment] + entities[0].height > entities[1].width and \
+                            entities[0].y[moment] < entities[1].y[moment] + entities[1].height:
+                break
+        if moment >= len(list(entities[0].x)):
+            moment = 0
+        return moment
+
+    elif entities[0].shape == "circle" and entities[1].shape == "rect":
+        moment = 0
+        for moment in range(len(entities[0].x)):
+            if entities[0].x[moment] + entities[0].r > entities[1].x[moment] and \
+                            entities[0].x[moment] < entities[1].x[moment] + entities[1].width and \
+                            entities[0].y[moment] + entities[0].r > entities[1].width and \
+                            entities[0].y[moment] < entities[1].y[moment] + entities[1].height:
+                break
+        if moment >= len(list(entities[0].x)):
+            moment = 0
+        return moment
+
+    elif entities[0].shape == "rect" and entities[1].shape == "circle":
+        moment = 0
+        for moment in range(len(entities[0].x)):
+            if entities[0].x[moment] + entities[0].width > entities[1].x[moment] and \
+                            entities[0].x[moment] < entities[1].x[moment] + entities[1].r and \
+                            entities[0].y[moment] + entities[0].height > entities[1].r and \
+                            entities[0].y[moment] < entities[1].y[moment] + entities[1].r:
                 break
         if moment >= len(list(entities[0].x)):
             moment = 0
