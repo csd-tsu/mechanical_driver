@@ -4,7 +4,7 @@
   "gravity": "1",
   "duration": 24,
   "interval": 0.2,
-  "c_friction": 1,
+  "c_friction": 0.2,
   "k": 55,
   "c_recovery": 1,
   "entities": [
@@ -13,7 +13,7 @@
       "x": 100,
       "y": 400,
       "vx": 60,
-      "vy": 60,
+      "vy": 0,
       "r": 60,
       "m": 2,
       "color": "#edb853"
@@ -22,8 +22,8 @@
       "type": "circle",
       "x": 700,
       "y": 400,
-      "vx": -30,
-      "vy": 60,
+      "vx": -60,
+      "vy": 0,
       "r": 40,
       "m": 1,
       "color": "#ff0000"
