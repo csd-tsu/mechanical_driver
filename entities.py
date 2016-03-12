@@ -32,4 +32,4 @@ class Rectangle(Entity):
         Entity.__init__(self, m, x0, vx0, y0, vy0, shape)
         self.width = width
         self.height = height
-        self.diagonal = self.width**2 + self.height**2
+        self.diagonal = sqrt(self.width**2 + self.height**2)
