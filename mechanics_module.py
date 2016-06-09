@@ -94,7 +94,7 @@ def search_collision(entities):
         return moment
 
 
-def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, r1, r2, m1, m2, c_recovery1, c_recovery2, dt,  mu, k):
+def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, r1, r2, m1, m2, dt, elasticity, mu, k):
     """Calculate velocities of two circles after 
     elastic or inelastic central collision."""
     
@@ -124,8 +124,8 @@ def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, r1, r2, m1, m2, c_recovery1, c
     """new normal velocities"""
     vy1n_new = vy1n
     vy2n_new = vy2n
-    vx1n_new = (m1 * vx1n + m2 * vx2n + m2 * c_recovery2 * vx2n - m2 * c_recovery2 * vx1n) / (m1 + m2)
-    vx2n_new = (m2 * vx2n + m1 * vx1n + m1 * c_recovery1 * vx1n - m1 * c_recovery1 * vx2n) / (m1 + m2)
+    vx1n_new = (m1 * vx1n + m2 * vx2n + m2 * elasticity * vx2n - m2 * elasticity * vx1n) / (m1 + m2)
+    vx2n_new = (m2 * vx2n + m1 * vx1n + m1 * elasticity * vx1n - m1 * elasticity * vx2n) / (m1 + m2)
     F1 = (m1*vx1n_new - m1*vx1n)/dt
     F2 = (m2*vx2n_new - m2*vx2n)/dt
 

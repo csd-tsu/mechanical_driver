@@ -27,27 +27,22 @@ entities = []
 for entity in scene["entities"]:
         if entity["type"] == "circle":
             circle = Circle(
-                m=entity["m"],
-                x0=entity["x"],
-                vx0=entity["vx"],
-                y0=entity["y"],
-                vy0=entity["vy"],
-                shape=entity["type"],
-                r=entity["r"],
-                c_recovery=entity["c_recovery"]
+                entity["m"],
+                entity["x"], entity["vx"],
+                entity["y"], entity["vy"],
+                entity["type"],
+                entity["r"],
             )
             entities.append(circle)
 
         elif entity["type"] == "rect":
             rect = Rectangle(
-                m=entity["m"],
-                x0=entity["x"],
-                vx0=entity["vx"],
-                y0=entity["y"],
-                vy0=entity["vy"],
-                shape=entity["type"],
-                width=entity["width"],
-                height=entity["height"]
+                entity["m"],
+                entity["x"], entity["vx"],
+                entity["y"], entity["vy"],
+                entity["type"],
+                entity["width"],
+                entity["height"]
             )
             entities.append(rect)
 
@@ -66,8 +61,7 @@ def collision():
                 pair[1].y[t_collision], pair[1].vy[t_collision],
                 pair[0].r, pair[1].r,
                 pair[0].m, pair[1].m,
-                pair[0].c_recovery, pair[1].c_recovery,
-                scene["interval"],
+                scene["interval"], scene["c_recovery"],
                 scene["c_friction"], scene["k"])
 
             """calculate initial velocities after central collision"""

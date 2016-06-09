@@ -22,10 +22,10 @@ class Entity:
 
 
 class Circle(Entity):
-    def __init__(self, m, x0, vx0, y0, vy0, shape, r, c_recovery):
+    def __init__(self, m, x0, vx0, y0, vy0, shape, r):
         Entity.__init__(self, m, x0, vx0, y0, vy0, shape)
         self.r = r
-        self.c_recovery = c_recovery
+
 
 class Rectangle(Entity):
     def __init__(self, m, x0, vx0, y0, vy0, shape, width, height):
