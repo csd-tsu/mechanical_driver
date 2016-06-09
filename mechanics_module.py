@@ -1,16 +1,20 @@
 import numpy as np
 from scipy.integrate import odeint
 sqrt = np.sqrt
-g = 9.81
 
 
-def trajectory(initial_vect, x, vx, y, vy, t):
+def trajectory(initial_vect, x, vx, y, vy, t, gravity):
     """
     Calculate positions and velocities of objects at every 
     predetermined moment of time 
     by solving the set of movement equations 
     and add them to the end of the lists.
     """
+    if gravity == 1:
+        g = 9.81
+    else:
+        g = 0
+
     initial_vect = np.array(initial_vect)
     x = list(x)
     vx = list(vx)
@@ -90,7 +94,7 @@ def search_collision(entities):
         return moment
 
 
-def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, m1, m2, dt, elasticity, mu, k):
+def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, r1, r2, m1, m2, c_recovery1, c_recovery2, dt,  mu, k):
     """Calculate velocities of two circles after 
     elastic or inelastic central collision."""
     
@@ -103,31 +107,39 @@ def collision(x1, vx1, y1, vy1, x2, vx2, y2, vy2, m1, m2, dt, elasticity, mu, k)
     uny = ny/sqrt(nx**2 + ny**2)
     
     """find the unit tangent vector ut"""
+    utx = -uny
     uty = unx
 
     """resolve the velocity vectors into normal (vn) 
     and tangential (vt) components"""
     vx1n = unx * vx1
+    vy1n = uny * vy1
     vx2n = unx * vx2
+    vy2n = uny * vy2
+    vx1t = uty * vx1
     vy1t = uty * vy1
+    vx2t = uty * vx2
     vy2t = uty * vy2
 
     """new normal velocities"""
-    vx1n_new = (m1*vx1n+m2*vx2n-(vx1n-vx2n)*m2*elasticity)/(m1+m2)
-    vx2n_new = (m1*vx1n+m2*vx2n+(vx1n-vx2n)*m1*elasticity)/(m1+m2)
-
+    vy1n_new = vy1n
+    vy2n_new = vy2n
+    vx1n_new = (m1 * vx1n + m2 * vx2n + m2 * c_recovery2 * vx2n - m2 * c_recovery2 * vx1n) / (m1 + m2)
+    vx2n_new = (m2 * vx2n + m1 * vx1n + m1 * c_recovery1 * vx1n - m1 * c_recovery1 * vx2n) / (m1 + m2)
     F1 = (m1*vx1n_new - m1*vx1n)/dt
-    F2 = (m2*vx2n_new - m1*vx2n)/dt
+    F2 = (m2*vx2n_new - m2*vx2n)/dt
 
     """new tangential velocities"""
-    vy1t_new = (F1*dt*mu + m1*vy1t)/m1
-    vy2t_new = (F2*dt*mu + m2*vy2t)/m2
+    vx1t_new = vx1t
+    vy1t_new = (m1*vy1t - F1*mu*dt)/m1
+    vx2t_new = vx2t
+    vy2t_new = (m2*vy2t - F2*mu*dt)/m2
 
     """final velocity vectors (v_new)"""
-    vx1_new = vx1n_new*unx + vx1
-    vy1_new = vy1*uny + vy1t_new*uty
-    vx2_new = vx2n_new*unx + vx2
-    vy2_new = vy2*uny + vy2t_new*uty
+    vx1_new = vx1n_new*unx + vx1t_new*utx
+    vy1_new = vy1n_new*uny + vy1t_new*uty
+    vx2_new = vx2n_new*unx + vx2t_new*utx
+    vy2_new = vy2n_new*uny + vy2t_new*uty
     
     # """angular velocities after collision"""
     # v1t_new = sqrt(vx1t_new**2 + vy1t_new**2)

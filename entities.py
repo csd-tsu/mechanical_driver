@@ -11,8 +11,8 @@ class Entity:
         self.shape = shape
         self.initial_vector = [x0, vx0, y0, vy0]
 
-    def trajectory(self, t):
-        self.x, self.vx, self.y, self.vy = trajectory(self.initial_vector, self.x, self.vx, self.y, self.vy, t)
+    def trajectory(self, t, gravity):
+        self.x, self.vx, self.y, self.vy = trajectory(self.initial_vector, self.x, self.vx, self.y, self.vy, t, gravity)
 
     def slice(self, t):
         self.x = self.x[:t]
@@ -22,10 +22,10 @@ class Entity:
 
 
 class Circle(Entity):
-    def __init__(self, m, x0, vx0, y0, vy0, shape, r):
+    def __init__(self, m, x0, vx0, y0, vy0, shape, r, c_recovery):
         Entity.__init__(self, m, x0, vx0, y0, vy0, shape)
         self.r = r
-
+        self.c_recovery = c_recovery
 
 class Rectangle(Entity):
     def __init__(self, m, x0, vx0, y0, vy0, shape, width, height):

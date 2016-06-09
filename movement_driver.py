@@ -21,27 +21,33 @@ scene["frames"] = []
 
 frames_col = int(scene["duration"] / scene["interval"])
 t = np.arange(0, scene["duration"], scene["interval"])
+gravity = int(scene["gravity"])
 entities = []
 
 for entity in scene["entities"]:
         if entity["type"] == "circle":
             circle = Circle(
-                entity["m"],
-                entity["x"], entity["vx"],
-                entity["y"], entity["vy"],
-                entity["type"],
-                entity["r"],
+                m=entity["m"],
+                x0=entity["x"],
+                vx0=entity["vx"],
+                y0=entity["y"],
+                vy0=entity["vy"],
+                shape=entity["type"],
+                r=entity["r"],
+                c_recovery=entity["c_recovery"]
             )
             entities.append(circle)
 
         elif entity["type"] == "rect":
             rect = Rectangle(
-                entity["m"],
-                entity["x"], entity["vx"],
-                entity["y"], entity["vy"],
-                entity["type"],
-                entity["width"],
-                entity["height"]
+                m=entity["m"],
+                x0=entity["x"],
+                vx0=entity["vx"],
+                y0=entity["y"],
+                vy0=entity["vy"],
+                shape=entity["type"],
+                width=entity["width"],
+                height=entity["height"]
             )
             entities.append(rect)
 
@@ -58,8 +64,10 @@ def collision():
                 pair[0].y[t_collision], pair[0].vy[t_collision],
                 pair[1].x[t_collision], pair[1].vx[t_collision],
                 pair[1].y[t_collision], pair[1].vy[t_collision],
+                pair[0].r, pair[1].r,
                 pair[0].m, pair[1].m,
-                scene["interval"], scene["c_recovery"],
+                pair[0].c_recovery, pair[1].c_recovery,
+                scene["interval"],
                 scene["c_friction"], scene["k"])
 
             """calculate initial velocities after central collision"""
@@ -76,13 +84,13 @@ def collision():
             t_new = np.arange(t[t_collision], scene["duration"], scene["interval"])
 
             """calculate new coordinates and velocities after collision"""
-            pair[0].trajectory(t_new)
-            pair[1].trajectory(t_new)
+            pair[0].trajectory(t_new, gravity)
+            pair[1].trajectory(t_new, gravity)
 
 
 def main():
     for entity in entities:
-        entity.trajectory(t)
+        entity.trajectory(t, gravity)
     collision()
 
 
