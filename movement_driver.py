@@ -100,7 +100,7 @@ for frame_index in xrange(1, frames_col):
         frame[j]["y"] = entity.y[frame_index]
         frame[j]["vx"] = entity.vx[frame_index]
         frame[j]["vy"] = entity.vy[frame_index]
-        frame[j]["v"] = np.sqrt(entity.vx[frame_index]**2 + entity[frame_index].vy**2)
+        frame[j]["v"] = np.sqrt(entity.vx[frame_index]**2 + entity.vy[frame_index]**2)
         frame[j]["p"] = frame[j]["v"]*entity.m
         frame[j]["t"] = scene["interval"]*frame_index
     scene["frames"].append(frame)
