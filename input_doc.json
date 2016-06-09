@@ -4,7 +4,7 @@
   "gravity": "1",
   "duration": 24,
   "interval": 0.2,
-  "c_friction": 0.2,
+  "c_friction": 0,
   "k": 55,
   "c_recovery": 1,
   "entities": [
