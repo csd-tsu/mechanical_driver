@@ -24,6 +24,11 @@ t = np.arange(0, scene["duration"], scene["interval"])
 gravity = int(scene["gravity"])
 entities = []
 
+if gravity:
+    g = 9.8
+else:
+    g = 0
+
 for entity in scene["entities"]:
         if entity["type"] == "circle":
             circle = Circle(
@@ -102,6 +107,9 @@ for frame_index in xrange(1, frames_col):
         frame[j]["vy"] = entity.vy[frame_index]
         frame[j]["v"] = np.sqrt(entity.vx[frame_index]**2 + entity.vy[frame_index]**2)
         frame[j]["p"] = frame[j]["v"]*entity.m
+        frame[j]["Ek"] = entity.m*frame[j]["v"]**2/2  # Kinetic Energy
+        frame[j]["Ep"] = entity.m*g*entity.y[frame_index]  # Potential Energy
+        frame[j]["E"] = frame[j]["Ek"] + frame[j]["Ep"]  # Full Energy
         frame[j]["t"] = scene["interval"]*frame_index
     scene["frames"].append(frame)
 
